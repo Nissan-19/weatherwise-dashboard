@@ -18,6 +18,7 @@ function App() {
     }
 
     try {
+      
       setIsLoading(true)
       setError("")
       setCityResults([])
@@ -50,8 +51,37 @@ function App() {
     }
   }
 
+  function getWeatherCondition(code) {
+    const weatherConditions = { //instead of writng too many if conditons we are saving the codes in one object
+      0: "Clear sky",           //this is called object look up
+      1: "Mainly clear",
+      2: "Partly cloudy",
+      3: "Overcast",
+      45: "Fog",
+      48: "Rime fog",
+      51: "Light drizzle",
+      53: "Moderate drizzle",
+      55: "Dense drizzle",
+      61: "Slight rain",
+      63: "Moderate rain",
+      65: "Heavy rain",
+      71: "Slight snow",
+      73: "Moderate snow",
+      75: "Heavy snow",
+      80: "Slight rain showers",
+      81: "Moderate rain showers",
+      82: "Violent rain showers",
+      95: "Thunderstorm",
+      96: "Thunderstorm with slight hail",
+      99: "Thunderstorm with heavy hail",
+    }
+
+        return weatherConditions[code] || "Unknown weather"
+    }
+
   async function fetchWeather(result){
     try{
+      
       setIsWeatherLoading(true)
       setError("")
       setCurrentWeather(null)
@@ -61,7 +91,7 @@ function App() {
 
       const data =  await response.json()
 
-      if(!data.current){
+      if(!data.current){ // the weather API sends the weather data inside a property called current.
         setError("Weather is not avaliable for this city")
         return
       }
@@ -77,7 +107,7 @@ function App() {
 
   function handleSelectCity(result) {
     setSelectedCity(result)
-    setCity(`${result.name}, ${result.country}`)
+    setCity(`${result.name}, ${result.country}`) //template literal. It builds a string using values from the clicked city object.
     setCityResults([])
     fetchWeather(result)
   }
@@ -175,9 +205,9 @@ function App() {
                 </div>
 
                 <div className="rounded-lg bg-slate-50 p-3">
-                  <p className="text-sm text-slate-500">Weather Code</p>
+                  <p className="text-sm text-slate-500">Weather Condition</p>
                   <p className="font-semibold text-slate-800">
-                    {currentWeather.weather_code}
+                    {getWeatherCondition(currentWeather.weather_code)}
                   </p>
                 </div>
               </div>

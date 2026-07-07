@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import "./App.css"
 
 function App() {
@@ -9,6 +9,24 @@ function App() {
   const [isLoading, setIsLoading] = useState(false)
   const [currentWeather, setCurrentWeather] = useState(null)
   const [isWeatherLoading, setIsWeatherLoading] = useState(false)
+  const [localTime, setLocalTime] = useState("")
+
+  useEffect(()=>{
+    if(!selectedCity){ //If no city is selected → clear local time and stop
+      setLocalTime("")
+      return
+    }
+
+    setLocalTime(getLocalTime(selectedCity.timezone)) //If city is selected → show local time immediately
+
+    const intervalId = setInterval(() => {
+      setLocalTime(getLocalTime(selectedCity.timezone))
+    }, 60000)
+
+    return()=>{
+      clearInterval(intervalId)
+    }
+  },[selectedCity?.timezone]) //make the dependency more precise. Because this effect depends specifically on the timezone.
 
   async function handleSearchCity(event) {
     event.preventDefault()
@@ -155,6 +173,14 @@ function App() {
     fetchWeather(result)
   }
 
+  function getLocalTime(timezone){
+     return new Date().toLocaleTimeString("en-GB" ,{ //create new current date and time // UK style time formatting
+      timeZone: timezone,
+      hour:"2-digit",
+      minute: "2-digit"
+     })
+  }
+
   return (
     <main className="min-h-screen bg-slate-100 p-4">
       <section className="mx-auto max-w-3xl rounded-xl bg-white p-6 shadow">
@@ -215,7 +241,7 @@ function App() {
             </p>
 
             <p className="mt-1 text-sm text-slate-500">
-              Timezone: {selectedCity.timezone}
+              Local Time: {localTime}
             </p>
           </div>
         )}

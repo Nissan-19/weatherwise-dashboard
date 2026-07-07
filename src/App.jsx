@@ -79,6 +79,49 @@ function App() {
         return weatherConditions[code] || "Unknown weather"
     }
 
+    function getWeatherAdvice(weather) {
+        const rainCodes = [51, 53, 55, 61, 63, 65, 80, 81, 82]
+        const snowCodes = [71, 73, 75]
+        const thunderstormCodes = [95, 96, 99]
+
+        if (weather.temperature_2m >= 30) {
+          return "It is hot outside. Stay hydrated and try to stay indoors."
+        }
+
+        if (weather.temperature_2m <= 8) {
+          return "It is cold outside. Wear warm clothes."
+        }
+
+        if (weather.wind_speed_10m >= 30) {
+          return "It is windy outside. Be careful if you are going out."
+        }
+
+        if (weather.relative_humidity_2m >= 80) {
+          return "It may feel humid and uncomfortable today."
+        }
+
+        if (rainCodes.includes(weather.weather_code)) {
+          return "Carry an umbrella. There may be rain."
+        } //For multiple possible matching values, use array.includes().
+
+        if (snowCodes.includes(weather.weather_code)) {
+          return "Snow is expected. Dress warmly and be careful outside."
+        }
+
+        if (thunderstormCodes.includes(weather.weather_code)) {
+          return "Thunderstorm conditions are possible. Avoid unnecessary outdoor activity."
+        }
+
+        if (
+          weather.temperature_2m >= 18 &&
+          weather.temperature_2m <= 26 &&
+          !rainCodes.includes(weather.weather_code)
+        ) {
+          return "Great weather for a walk or outdoor activity."
+        }
+
+      return "Weather looks normal. Plan your day comfortably."
+    }
   async function fetchWeather(result){
     try{
       
@@ -205,11 +248,20 @@ function App() {
                 </div>
 
                 <div className="rounded-lg bg-slate-50 p-3">
-                  <p className="text-sm text-slate-500">Weather Condition</p>
+                  <p className="text-sm text-slate-500">Weather</p>
                   <p className="font-semibold text-slate-800">
                     {getWeatherCondition(currentWeather.weather_code)}
+                    
                   </p>
                 </div>
+
+                <div className="rounded-lg bg-slate-50 p-3">
+                  <p className="text-sm text-slate-500">💡 Smart Advice</p>
+                  <p className="font-semibold text-slate-800">
+                    {getWeatherAdvice(currentWeather)}
+                  </p>
+                </div>
+
               </div>
             </div>
             )}

@@ -240,6 +240,10 @@ function App() {
     setSavedCities(updatedSavedCityList)
   }
 
+  function handleClearSavedCities() {
+    setSavedCities([])
+  }
+
   return (
     <main className="min-h-screen bg-slate-100 p-4">
       <section className="mx-auto max-w-3xl rounded-xl bg-white p-6 shadow">
@@ -396,6 +400,15 @@ function App() {
                   </button>
                 </li>
               ))}
+                {savedCities.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={handleClearSavedCities}
+                      className="mt-4 w-full rounded-lg bg-red-600 px-4 py-2 font-medium text-white hover:bg-red-700"
+                    >
+                      Clear All Saved Cities
+                    </button>
+                    )}
             </ul>
           </div>
         )}

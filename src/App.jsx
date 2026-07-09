@@ -10,23 +10,24 @@ function App() {
   const [currentWeather, setCurrentWeather] = useState(null)
   const [isWeatherLoading, setIsWeatherLoading] = useState(false)
   const [localTime, setLocalTime] = useState("")
+  const [savedCities, setSavedCities] = useState([])
 
-  useEffect(()=>{
-    if(!selectedCity){ //If no city is selected → clear local time and stop
+  useEffect(() => {
+    if (!selectedCity) {
       setLocalTime("")
       return
     }
 
-    setLocalTime(getLocalTime(selectedCity.timezone)) //If city is selected → show local time immediately
+    setLocalTime(getLocalTime(selectedCity.timezone))
 
     const intervalId = setInterval(() => {
       setLocalTime(getLocalTime(selectedCity.timezone))
     }, 60000)
 
-    return()=>{
+    return () => {
       clearInterval(intervalId)
     }
-  },[selectedCity?.timezone]) //make the dependency more precise. Because this effect depends specifically on the timezone.
+  }, [selectedCity?.timezone])
 
   async function handleSearchCity(event) {
     event.preventDefault()
@@ -36,7 +37,6 @@ function App() {
     }
 
     try {
-      
       setIsLoading(true)
       setError("")
       setCityResults([])
@@ -44,19 +44,14 @@ function App() {
       setCurrentWeather(null)
       setLocalTime("")
 
-      // URL does not like spaces, so we are making the city name safe for the URL
       const searchCity = encodeURIComponent(city.trim())
 
-      // This API needs a query parameter to search for the city
       const response = await fetch(
         `https://geocoding-api.open-meteo.com/v1/search?name=${searchCity}&count=5`
-        // count=5 means show max 5 cities
       )
 
       const data = await response.json()
-      
 
-      // The Open-Meteo API returns an object with "results" inside
       if (!data.results) {
         setError("City not found. Please try again.")
         return
@@ -67,14 +62,13 @@ function App() {
     } catch (error) {
       setError("Something went wrong. Please try again.")
     } finally {
-      // Whether API succeeds or fails, stop loading
       setIsLoading(false)
     }
   }
 
   function getWeatherCondition(code) {
-    const weatherConditions = { //instead of writng too many if conditons we are saving the codes in one object
-      0: "Clear sky",           //this is called object look up
+    const weatherConditions = {
+      0: "Clear sky",
       1: "Mainly clear",
       2: "Partly cloudy",
       3: "Overcast",
@@ -97,94 +91,95 @@ function App() {
       99: "Thunderstorm with heavy hail",
     }
 
-        return weatherConditions[code] || "Unknown weather"
+    return weatherConditions[code] || "Unknown weather"
+  }
+
+  function getWeatherAdvice(weather) {
+    const rainCodes = [51, 53, 55, 61, 63, 65, 80, 81, 82]
+    const snowCodes = [71, 73, 75]
+    const thunderstormCodes = [95, 96, 99]
+
+    if (weather.temperature_2m >= 30) {
+      return "It is hot outside. Stay hydrated and try to stay indoors."
     }
 
-    function getWeatherAdvice(weather) {
-        const rainCodes = [51, 53, 55, 61, 63, 65, 80, 81, 82]
-        const snowCodes = [71, 73, 75]
-        const thunderstormCodes = [95, 96, 99]
-
-        if (weather.temperature_2m >= 30) {
-          return "It is hot outside. Stay hydrated and try to stay indoors."
-        }
-
-        if (weather.temperature_2m <= 8) {
-          return "It is cold outside. Wear warm clothes."
-        }
-
-        if (weather.wind_speed_10m >= 30) {
-          return "It is windy outside. Be careful if you are going out."
-        }
-
-        if (weather.relative_humidity_2m >= 80) {
-          return "It may feel humid and uncomfortable today."
-        }
-
-        if (rainCodes.includes(weather.weather_code)) {
-          return "Carry an umbrella. There may be rain."
-        } //For multiple possible matching values, use array.includes().
-
-        if (snowCodes.includes(weather.weather_code)) {
-          return "Snow is expected. Dress warmly and be careful outside."
-        }
-
-        if (thunderstormCodes.includes(weather.weather_code)) {
-          return "Thunderstorm conditions are possible. Avoid unnecessary outdoor activity."
-        }
-
-        if (
-          weather.temperature_2m >= 18 &&
-          weather.temperature_2m <= 26 &&
-          !rainCodes.includes(weather.weather_code)
-        ) {
-          return "Great weather for a walk or outdoor activity."
-        }
-
-      return "Weather looks normal. Plan your day comfortably."
+    if (weather.temperature_2m <= 8) {
+      return "It is cold outside. Wear warm clothes."
     }
-  async function fetchWeather(result){
-    try{
-      
+
+    if (weather.wind_speed_10m >= 30) {
+      return "It is windy outside. Be careful if you are going out."
+    }
+
+    if (weather.relative_humidity_2m >= 80) {
+      return "It may feel humid and uncomfortable today."
+    }
+
+    if (rainCodes.includes(weather.weather_code)) {
+      return "Carry an umbrella. There may be rain."
+    }
+
+    if (snowCodes.includes(weather.weather_code)) {
+      return "Snow is expected. Dress warmly and be careful outside."
+    }
+
+    if (thunderstormCodes.includes(weather.weather_code)) {
+      return "Thunderstorm conditions are possible. Avoid unnecessary outdoor activity."
+    }
+
+    if (
+      weather.temperature_2m >= 18 &&
+      weather.temperature_2m <= 26 &&
+      !rainCodes.includes(weather.weather_code)
+    ) {
+      return "Great weather for a walk or outdoor activity."
+    }
+
+    return "Weather looks normal. Plan your day comfortably."
+  }
+
+  async function fetchWeather(result) {
+    try {
       setIsWeatherLoading(true)
       setError("")
       setCurrentWeather(null)
 
-      const response= await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${result.latitude}&longitude=${result.longitude}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&timezone=auto`
+      const response = await fetch(
+        `https://api.open-meteo.com/v1/forecast?latitude=${result.latitude}&longitude=${result.longitude}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&timezone=auto`
       )
 
-      const data =  await response.json()
+      const data = await response.json()
 
-      if(!data.current){ // the weather API sends the weather data inside a property called current.
-        setError("Weather is not avaliable for this city")
+      if (!data.current) {
+        setError("Weather is not available for this city.")
         return
       }
 
       setCurrentWeather(data.current)
-      console.log("Weather Data:",data.current)
-    } catch(error) {
-      setError("Could not fetch eather. plese try again.")
-    }finally{
+      console.log("Weather Data:", data.current)
+    } catch (error) {
+      setError("Could not fetch weather. Please try again.")
+    } finally {
       setIsWeatherLoading(false)
     }
   }
 
   function handleSelectCity(result) {
     setSelectedCity(result)
-    setCity(`${result.name}, ${result.country}`) //template literal. It builds a string using values from the clicked city object.
+    setCity(`${result.name}, ${result.country}`)
     setCityResults([])
     fetchWeather(result)
   }
 
-  function getLocalTime(timezone){
-     return new Date().toLocaleTimeString("en-GB" ,{ //create new current date and time // UK style time formatting
+  function getLocalTime(timezone) {
+    return new Date().toLocaleTimeString("en-GB", {
       timeZone: timezone,
-      hour:"2-digit",
-      minute: "2-digit"
-     })
+      hour: "2-digit",
+      minute: "2-digit",
+    })
   }
 
-  function handleResetApp(){
+  function handleResetApp() {
     setCity("")
     setCityResults([])
     setError("")
@@ -193,6 +188,23 @@ function App() {
     setLocalTime("")
     setIsLoading(false)
     setIsWeatherLoading(false)
+  }
+
+  function handleSaveCity() {
+    if (!selectedCity) {
+      return
+    }
+
+    const alreadySaved = savedCities.some(
+      (savedCity) => savedCity.id === selectedCity.id
+    )
+
+    if (alreadySaved) {
+      console.log("City already exists")
+      return
+    }
+
+    setSavedCities([...savedCities, selectedCity])
   }
 
   return (
@@ -207,9 +219,9 @@ function App() {
         </p>
 
         <form
-            onSubmit={handleSearchCity}
-            className="mx-auto mt-6 flex w-full max-w-2xl flex-col gap-3 sm:flex-row"
-          >
+          onSubmit={handleSearchCity}
+          className="mx-auto mt-6 flex w-full max-w-2xl flex-col gap-3 sm:flex-row"
+        >
           <input
             type="text"
             placeholder="Search City..."
@@ -221,22 +233,20 @@ function App() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 sm:w-auto"
-
+            className="w-full rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
           >
             {isLoading ? "Searching..." : "Search"}
           </button>
 
           {selectedCity && (
-          <button
-            type="button"
-            onClick={handleResetApp}
-            className="w-full rounded-lg bg-red-600 px-4 py-2 font-medium text-white hover:bg-red-700 sm:w-auto"
-  
-          >
-            Reset
-          </button>
-        )}
+            <button
+              type="button"
+              onClick={handleResetApp}
+              className="w-full rounded-lg bg-red-600 px-4 py-2 font-medium text-white hover:bg-red-700 sm:w-auto"
+            >
+              Reset
+            </button>
+          )}
         </form>
 
         {error && <p className="mt-4 text-red-600">{error}</p>}
@@ -253,14 +263,11 @@ function App() {
               </p>
 
               <p className="text-sm text-slate-500">
-                {result.admin1 && `${result.admin1} `}
-                
+                {result.admin1 && `${result.admin1}`}
               </p>
             </li>
           ))}
         </ul>
-        
-        
 
         {selectedCity && (
           <div className="mt-4 rounded-lg bg-blue-50 p-4 text-slate-700">
@@ -271,54 +278,81 @@ function App() {
             <p className="mt-1 text-sm text-slate-500">
               Local Time: {localTime}
             </p>
+
+            <button
+              type="button"
+              onClick={handleSaveCity}
+              className="mt-3 rounded-lg bg-green-600 px-4 py-2 font-medium text-white hover:bg-green-700"
+            >
+              Save City
+            </button>
           </div>
         )}
 
         {isWeatherLoading && (
-            <p className="mt-4 text-slate-500">Loading weather...</p>
+          <p className="mt-4 text-slate-500">Loading weather...</p>
         )}
 
         {currentWeather && (
-            <div className="mt-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-              <h2 className="text-xl font-bold text-slate-800">Current Weather</h2>
+          <div className="mt-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <h2 className="text-xl font-bold text-slate-800">
+              Current Weather
+            </h2>
 
-              <p className="mt-3 text-4xl font-bold text-slate-900">
-                {currentWeather.temperature_2m}°C
-              </p>
+            <p className="mt-3 text-4xl font-bold text-slate-900">
+              {currentWeather.temperature_2m}°C
+            </p>
 
-              <div className="mt-4 grid gap-3 md:grid-cols-2">
-                <div className="rounded-lg bg-slate-50 p-3">
-                  <p className="text-sm text-slate-500">Humidity</p>
-                  <p className="font-semibold text-slate-800">
-                    {currentWeather.relative_humidity_2m}%
-                  </p>
-                </div>
+            <div className="mt-4 grid gap-3 md:grid-cols-2">
+              <div className="rounded-lg bg-slate-50 p-3">
+                <p className="text-sm text-slate-500">Humidity</p>
+                <p className="font-semibold text-slate-800">
+                  {currentWeather.relative_humidity_2m}%
+                </p>
+              </div>
 
-                <div className="rounded-lg bg-slate-50 p-3">
-                  <p className="text-sm text-slate-500">Wind</p>
-                  <p className="font-semibold text-slate-800">
-                    {currentWeather.wind_speed_10m} km/h
-                  </p>
-                </div>
+              <div className="rounded-lg bg-slate-50 p-3">
+                <p className="text-sm text-slate-500">Wind</p>
+                <p className="font-semibold text-slate-800">
+                  {currentWeather.wind_speed_10m} km/h
+                </p>
+              </div>
 
-                <div className="rounded-lg bg-slate-50 p-3">
-                  <p className="text-sm text-slate-500">Weather</p>
-                  <p className="font-semibold text-slate-800">
-                    {getWeatherCondition(currentWeather.weather_code)}
-                    
-                  </p>
-                </div>
+              <div className="rounded-lg bg-slate-50 p-3">
+                <p className="text-sm text-slate-500">Weather</p>
+                <p className="font-semibold text-slate-800">
+                  {getWeatherCondition(currentWeather.weather_code)}
+                </p>
+              </div>
 
-                <div className="rounded-lg bg-slate-50 p-3">
-                  <p className="text-sm text-slate-500">💡 Smart Advice</p>
-                  <p className="font-semibold text-slate-800">
-                    {getWeatherAdvice(currentWeather)}
-                  </p>
-                </div>
-
+              <div className="rounded-lg bg-slate-50 p-3">
+                <p className="text-sm text-slate-500">💡 Smart Advice</p>
+                <p className="font-semibold text-slate-800">
+                  {getWeatherAdvice(currentWeather)}
+                </p>
               </div>
             </div>
-            )}
+          </div>
+        )}
+
+        {savedCities.length > 0 && (
+          <div className="mt-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <h2 className="text-xl font-bold text-slate-800">
+              Saved Cities
+            </h2>
+
+            <ul className="mt-3 space-y-2">
+              {savedCities.map((savedCity) => (
+                <li
+                  key={savedCity.id}
+                  className="rounded-lg bg-slate-50 px-4 py-3 text-slate-700"
+                >
+                  {savedCity.name}, {savedCity.country}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </section>
     </main>
   )

@@ -345,7 +345,8 @@ function App() {
               {savedCities.map((savedCity) => (
                 <li
                   key={savedCity.id}
-                  className="rounded-lg bg-slate-50 px-4 py-3 text-slate-700"
+                  onClick={() => handleSelectCity(savedCity)}
+                  className="cursor-pointer rounded-lg bg-slate-50 px-4 py-3 text-slate-700 hover:bg-blue-50"
                 >
                   {savedCity.name}, {savedCity.country}
                 </li>

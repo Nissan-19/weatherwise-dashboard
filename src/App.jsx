@@ -184,6 +184,17 @@ function App() {
      })
   }
 
+  function handleResetApp(){
+    setCity("")
+    setCityResults([])
+    setError("")
+    setSelectedCity(null)
+    setCurrentWeather(null)
+    setLocalTime("")
+    setIsLoading(false)
+    setIsWeatherLoading(false)
+  }
+
   return (
     <main className="min-h-screen bg-slate-100 p-4">
       <section className="mx-auto max-w-3xl rounded-xl bg-white p-6 shadow">
@@ -236,6 +247,16 @@ function App() {
             </li>
           ))}
         </ul>
+        
+        {selectedCity && (
+          <button
+            type="button"
+            onClick={handleResetApp}
+            className="rounded-lg bg-red-600 px-4 py-2 font-medium text-white hover:bg-red-700"
+          >
+            Reset
+          </button>
+        )}
 
         {selectedCity && (
           <div className="mt-4 rounded-lg bg-blue-50 p-4 text-slate-700">

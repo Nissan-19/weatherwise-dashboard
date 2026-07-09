@@ -10,7 +10,32 @@ function App() {
   const [currentWeather, setCurrentWeather] = useState(null)
   const [isWeatherLoading, setIsWeatherLoading] = useState(false)
   const [localTime, setLocalTime] = useState("")
-  const [savedCities, setSavedCities] = useState([])
+  
+  const [savedCities, setSavedCities] = useState(() => { //lazy initial state // beacuse we dont want an empty array everytime
+  try {                                                  //   if local storage has cities then start with cities or empty array
+    const storedCities = localStorage.getItem("savedCities")
+
+    if (!storedCities) {
+      return []
+    }
+
+    const parsedCities = JSON.parse(storedCities)
+
+    if (Array.isArray(parsedCities)) { //to check if the parsed result is really an array
+      return parsedCities
+    }
+
+    return []
+  } catch (error) {
+    console.log("Could not load saved cities", error)
+    localStorage.removeItem("savedCities")
+    return []
+  }
+})
+
+    useEffect(()=>{
+      localStorage.setItem("savedCities", JSON.stringify(savedCities))
+    },[savedCities])
 
   useEffect(() => {
     if (!selectedCity) {

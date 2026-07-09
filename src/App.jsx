@@ -207,6 +207,14 @@ function App() {
     setSavedCities([...savedCities, selectedCity])
   }
 
+  function handleRemoveSavedCity(cityId){
+    const updatedSavedCityList = (savedCities.filter(
+      (savedCity)=>savedCity.id !=cityId
+    ))
+
+    setSavedCities(updatedSavedCityList)
+  }
+
   return (
     <main className="min-h-screen bg-slate-100 p-4">
       <section className="mx-auto max-w-3xl rounded-xl bg-white p-6 shadow">
@@ -348,7 +356,19 @@ function App() {
                   onClick={() => handleSelectCity(savedCity)}
                   className="cursor-pointer rounded-lg bg-slate-50 px-4 py-3 text-slate-700 hover:bg-blue-50"
                 >
-                  {savedCity.name}, {savedCity.country}
+                  <span>
+                    {savedCity.name}, {savedCity.country}
+                  </span>
+
+                  <button
+                    type="button"
+                    onClick={(event)=>{
+                      event.stopPropagation()
+                      handleRemoveSavedCity(savedCity.id)
+                    }}
+                    className="rounded-lg bg-red-100 px-3 py-1 text-sm font-medium text-red-700 hover:bg-red-200">
+                      Remove
+                  </button>
                 </li>
               ))}
             </ul>

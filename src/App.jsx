@@ -40,6 +40,9 @@ function App() {
       setIsLoading(true)
       setError("")
       setCityResults([])
+      setSelectedCity(null)
+      setCurrentWeather(null)
+      setLocalTime("")
 
       // URL does not like spaces, so we are making the city name safe for the URL
       const searchCity = encodeURIComponent(city.trim())

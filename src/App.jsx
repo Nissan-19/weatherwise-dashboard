@@ -207,24 +207,36 @@ function App() {
         </p>
 
         <form
-          onSubmit={handleSearchCity}
-          className="mt-6 flex flex-col gap-3 sm:flex-row"
-        >
+            onSubmit={handleSearchCity}
+            className="mx-auto mt-6 flex w-full max-w-2xl flex-col gap-3 sm:flex-row"
+          >
           <input
             type="text"
             placeholder="Search City..."
             value={city}
             onChange={(event) => setCity(event.target.value)}
-            className="flex-1 rounded-lg border border-slate-300 px-4 py-2 outline-none focus:border-blue-500"
+            className="w-full rounded-lg border border-slate-300 px-4 py-2 outline-none focus:border-blue-500 sm:flex-1"
           />
 
           <button
             type="submit"
             disabled={isLoading}
-            className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
+            className="w-full rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 sm:w-auto"
+
           >
             {isLoading ? "Searching..." : "Search"}
           </button>
+
+          {selectedCity && (
+          <button
+            type="button"
+            onClick={handleResetApp}
+            className="w-full rounded-lg bg-red-600 px-4 py-2 font-medium text-white hover:bg-red-700 sm:w-auto"
+  
+          >
+            Reset
+          </button>
+        )}
         </form>
 
         {error && <p className="mt-4 text-red-600">{error}</p>}
@@ -248,15 +260,7 @@ function App() {
           ))}
         </ul>
         
-        {selectedCity && (
-          <button
-            type="button"
-            onClick={handleResetApp}
-            className="rounded-lg bg-red-600 px-4 py-2 font-medium text-white hover:bg-red-700"
-          >
-            Reset
-          </button>
-        )}
+        
 
         {selectedCity && (
           <div className="mt-4 rounded-lg bg-blue-50 p-4 text-slate-700">

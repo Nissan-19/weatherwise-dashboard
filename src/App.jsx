@@ -282,7 +282,7 @@ function App() {
                 {currentWeather.temperature_2m}°C
               </p>
 
-              <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              <div className="mt-4 grid gap-3 md:grid-cols-2">
                 <div className="rounded-lg bg-slate-50 p-3">
                   <p className="text-sm text-slate-500">Humidity</p>
                   <p className="font-semibold text-slate-800">

@@ -4,6 +4,10 @@ WeatherWise Dashboard is a React weather application that allows users to search
 
 This project was built as part of my React learning journey, with a focus on API integration, state management, component structure, localStorage, and clean UI behavior.
 
+## Live Demo
+
+[View Live Project](https://weatherwise-dashboard19.vercel.app/)
+
 ## Features
 
 - Search for cities using the Open-Meteo Geocoding API

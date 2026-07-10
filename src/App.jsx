@@ -394,20 +394,21 @@ function App() {
                 <li
                   key={savedCity.id}
                   onClick={() => handleSelectCity(savedCity)}
-                  className="cursor-pointer rounded-lg bg-slate-50 px-4 py-3 text-slate-700 hover:bg-blue-50"
+                  className="flex cursor-pointer items-center justify-between gap-3 rounded-lg bg-slate-50 px-4 py-3 text-slate-700 hover:bg-blue-50"
                 >
-                  <span>
+                  <span className="min-w-0 truncate font-medium">
                     {savedCity.name}, {savedCity.country}
                   </span>
 
                   <button
                     type="button"
-                    onClick={(event)=>{
+                    onClick={(event) => {
                       event.stopPropagation()
                       handleRemoveSavedCity(savedCity.id)
                     }}
-                    className="rounded-lg bg-red-100 px-3 py-1 text-sm font-medium text-red-700 hover:bg-red-200">
-                      Remove
+                    className="shrink-0 rounded-lg bg-red-100 px-3 py-1 text-sm font-medium text-red-700 hover:bg-red-200"
+                  >
+                    Remove
                   </button>
                 </li>
               ))}

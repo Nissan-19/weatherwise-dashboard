@@ -244,6 +244,11 @@ function App() {
     setSavedCities([])
   }
 
+  const isSelectedCitySaved =  //this is derived value
+    selectedCity && savedCities.some((savedCity)=>savedCity.id === selectedCity.id)
+    //If a city is selected, check whether that selected city already exists in savedCities.
+
+
   return (
     <main className="min-h-screen bg-slate-100 p-4">
       <section className="mx-auto max-w-3xl rounded-xl bg-white p-6 shadow">
@@ -319,10 +324,16 @@ function App() {
             <button
               type="button"
               onClick={handleSaveCity}
-              className="mt-3 rounded-lg bg-green-600 px-4 py-2 font-medium text-white hover:bg-green-700"
+              disabled={isSelectedCitySaved}
+             className="mt-3 rounded-lg bg-green-600 px-4 py-2 font-medium text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Save City
+              {isSelectedCitySaved ? "Saved" : "Save City"}
             </button>
+            {isSelectedCitySaved &&(
+              <p className="mt-2 text-sm text-green-700">
+                This City is already saved.
+              </p>
+            )}
           </div>
         )}
 
